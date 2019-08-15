@@ -1,6 +1,9 @@
 ---
 # Copyright 2018 Anh K. Hoang
 #
+# Description: This is the most simplest case of a cloudformation. We are creating only one EC2 instanc ein existing SG and Subnet.
+# AWSTemplateFormatVersion: "2010-09-09"  
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and  
 # associated documentation files (the "Software"), to deal in the Software without restriction, 
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, 
@@ -15,8 +18,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# About: This is the most simplest case of a cloudformation. We are creating only one EC2 instanc ein existing SG and Subnet.
-AWSTemplateFormatVersion: "2010-09-09"  
+
 Resources:  
   WebInstance:
     Type: AWS::EC2::Instance

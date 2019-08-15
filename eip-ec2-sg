@@ -1,0 +1,135 @@
+---
+# Copyright 2018 Anh K. Hoang
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and  
+# associated documentation files (the "Software"), to deal in the Software without restriction, 
+# including without limitation the rights to use, copy, modify, merge, publish, distribute, 
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is  
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or substantial 
+# portions of the Software.
+# 
+# THE TEMPLATE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT 
+# NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    b372558d-b9fb-4b25-89db-25fc5c22e5d9:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 340
+        'y': 140
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - 91f64b8c-19b8-4d13-a79e-f3d16a84a4f7
+        - e1724e59-2264-4f5a-a574-c11d5dc60e59
+        - 5c6d1637-801c-4b80-bb34-f0ba67918a79
+      dependson:
+        - 91f64b8c-19b8-4d13-a79e-f3d16a84a4f7
+    f54fd5f9-6d66-4c3a-94cb-6abf73d9739f:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 220
+        'y': 140
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - b372558d-b9fb-4b25-89db-25fc5c22e5d9
+      dependson:
+        - b372558d-b9fb-4b25-89db-25fc5c22e5d9
+    e1724e59-2264-4f5a-a574-c11d5dc60e59:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 480
+        'y': 200
+      z: 0
+      embeds: []
+    5c6d1637-801c-4b80-bb34-f0ba67918a79:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 480
+        'y': 80
+      z: 0
+      embeds: []
+    9988c78c-cb3d-4441-a857-aa8f3fb9d2fb:
+      source:
+        id: b372558d-b9fb-4b25-89db-25fc5c22e5d9
+      target:
+        id: 5c6d1637-801c-4b80-bb34-f0ba67918a79
+      z: 11
+    c49149d4-9daa-4f78-8388-8b3a35c326bd:
+      source:
+        id: b372558d-b9fb-4b25-89db-25fc5c22e5d9
+        selector: 'g:nth-child(1) g:nth-child(4) g:nth-child(7) circle:nth-child(1)     '
+        port: 'AWS::RefLink-AWS::EC2::SecurityGroup-SecurityGroupIds'
+      target:
+        id: e1724e59-2264-4f5a-a574-c11d5dc60e59
+      z: 13
+    5e94a2d5-95dc-4c08-8da1-500c3df850e2:
+      source:
+        id: f54fd5f9-6d66-4c3a-94cb-6abf73d9739f
+        selector: 'g:nth-child(1) g:nth-child(4) g:nth-child(2) circle:nth-child(1)     '
+        port: 'AWS::RefLink-AWS::EC2::Instance-InstanceId'
+      target:
+        id: b372558d-b9fb-4b25-89db-25fc5c22e5d9
+      z: 13
+    cf49429c-618f-4c1b-abbd-ea14d309c3a5:
+      source:
+        id: f54fd5f9-6d66-4c3a-94cb-6abf73d9739f
+        selector: 'g:nth-child(1) g:nth-child(4) g:nth-child(2) circle:nth-child(1)     '
+        port: 'AWS::RefLink-AWS::EC2::Instance-InstanceId'
+      target:
+        id: b372558d-b9fb-4b25-89db-25fc5c22e5d9
+      z: 13
+    69bfa60a-472d-47d0-a131-c48b9506e5eb:
+      source:
+        id: f54fd5f9-6d66-4c3a-94cb-6abf73d9739f
+      target:
+        id: b372558d-b9fb-4b25-89db-25fc5c22e5d9
+      z: 12
+Resources:
+  TestEC2Inst:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SecurityGroupIds:
+        - !Ref SGTest2
+        - !Ref SGTest1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b372558d-b9fb-4b25-89db-25fc5c22e5d9
+    DependsOn:
+      - SGTest1
+  TestElasticIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      InstanceId: !Ref TestEC2Inst
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f54fd5f9-6d66-4c3a-94cb-6abf73d9739f
+    DependsOn:
+      - TestEC2Inst
+  SGTest2:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: sg-011b6a770d8a171e5
+  SGTest1:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: sg-011b6a770d8a171e5

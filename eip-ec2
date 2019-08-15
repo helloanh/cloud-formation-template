@@ -1,0 +1,82 @@
+---
+# Copyright 2018 Anh K. Hoang
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and  
+# associated documentation files (the "Software"), to deal in the Software without restriction, 
+# including without limitation the rights to use, copy, modify, merge, publish, distribute, 
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is  
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or substantial 
+# portions of the Software.
+# 
+# THE TEMPLATE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT 
+# NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    aa2dd638-d847-4097-a493-ea2bb1e21302:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -10
+        'y': -290
+      z: 0
+      embeds: []
+    f5b82836-1130-45c8-99b3-52a56c6cbc5c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -190
+        'y': -290
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - aa2dd638-d847-4097-a493-ea2bb1e21302
+    eab5496a-91e9-440c-902f-8a836405f76b:
+      source:
+        id: f5b82836-1130-45c8-99b3-52a56c6cbc5c
+        selector: 'g:nth-child(1) g:nth-child(4) g:nth-child(2) circle:nth-child(1)     '
+        port: 'AWS::RefLink-AWS::EC2::Instance-InstanceId'
+      target:
+        id: aa2dd638-d847-4097-a493-ea2bb1e21302
+      z: 2
+    9f35c7cf-04c3-47dd-9e73-d96b96bbcb83:
+      source:
+        id: f5b82836-1130-45c8-99b3-52a56c6cbc5c
+        selector: 'g:nth-child(1) g:nth-child(4) g:nth-child(2) circle:nth-child(1)     '
+        port: 'AWS::RefLink-AWS::EC2::Instance-InstanceId'
+      target:
+        id: aa2dd638-d847-4097-a493-ea2bb1e21302
+      z: 2
+    fdfe9304-247d-4d26-b3f3-7f565c16d56f:
+      source:
+        id: f5b82836-1130-45c8-99b3-52a56c6cbc5c
+      target:
+        id: aa2dd638-d847-4097-a493-ea2bb1e21302
+      z: 1
+Resources:
+  TestEC2:
+    Type: 'AWS::EC2::Instance'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: aa2dd638-d847-4097-a493-ea2bb1e21302
+  TestEIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      InstanceId: !Ref TestEC2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f5b82836-1130-45c8-99b3-52a56c6cbc5c
+  EC2EIPA2BHS4:
+    Type: 'AWS::EC2::EIPAssociation'
+    Properties:
+      InstanceId: !Ref TestEC2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: fdfe9304-247d-4d26-b3f3-7f565c16d56f

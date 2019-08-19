@@ -1,0 +1,192 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    c0c42d84-ca59-4156-aeae-34890990b963:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 120
+        'y': 190
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - 555e4878-c58c-448c-884d-5f15404e625a
+      dependson:
+        - 555e4878-c58c-448c-884d-5f15404e625a
+        - edce32d9-f5a8-4e71-bfd6-a2377d5e9abb
+    555e4878-c58c-448c-884d-5f15404e625a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 400
+        'y': 90
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - 755e5675-38bb-41f8-a6f0-92661a7439cb
+    edce32d9-f5a8-4e71-bfd6-a2377d5e9abb:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 60
+        'y': 90
+      z: 1
+      embeds: []
+    741d73bf-1358-4b19-b936-8e5c3ff30864:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 180
+        'y': 90
+      z: 1
+      embeds: []
+    755e5675-38bb-41f8-a6f0-92661a7439cb:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 290
+        'y': 90
+      z: 1
+      embeds: []
+Parameters:
+  DBName:
+    Default: MyDatabase
+    Description: The database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBUser:
+    NoEcho: 'true'
+    Description: The database admin account username
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: The database admin account password
+    Type: String
+    MinLength: '1'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]+'
+    ConstraintDescription: must contain only alphanumeric characters.
+  DBAllocatedStorage:
+    Default: '5'
+    Description: The size of the database (Gb)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '1024'
+    ConstraintDescription: must be between 5 and 1024Gb.
+  DBInstanceClass:
+    Description: The database instance type
+    Type: String
+    Default: db.t2.small
+    AllowedValues:
+      - db.t1.micro
+      - db.m1.small
+      - db.m1.medium
+      - db.m1.large
+      - db.m1.xlarge
+      - db.m2.xlarge
+      - db.m2.2xlarge
+      - db.m2.4xlarge
+      - db.m3.medium
+      - db.m3.large
+      - db.m3.xlarge
+      - db.m3.2xlarge
+      - db.m4.large
+      - db.m4.xlarge
+      - db.m4.2xlarge
+      - db.m4.4xlarge
+      - db.m4.10xlarge
+      - db.r3.large
+      - db.r3.xlarge
+      - db.r3.2xlarge
+      - db.r3.4xlarge
+      - db.r3.8xlarge
+      - db.m2.xlarge
+      - db.m2.2xlarge
+      - db.m2.4xlarge
+      - db.cr1.8xlarge
+      - db.t2.micro
+      - db.t2.small
+      - db.t2.medium
+      - db.t2.large
+    ConstraintDescription: must select a valid database instance type.
+Resources:
+  EC2Test:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SecurityGroupIds:
+        - !Ref TestSG
+      InstanceType: t2.micro
+      KeyName: testRoyi-us-east-1
+      ImageId: ami-0b898040803850657
+      SubnetId: subnet-ed7910d3
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c0c42d84-ca59-4156-aeae-34890990b963
+    DependsOn:
+      - TestSG
+  WebServerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable HTTP access via port 80 and SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 741d73bf-1358-4b19-b936-8e5c3ff30864
+  TestSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: enable rails port
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '3000'
+          ToPort: '3000'
+          CidrIp: 0.0.0.0/0
+      VpcId: vpc-6398ee19
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: edce32d9-f5a8-4e71-bfd6-a2377d5e9abb
+  DBSecurityGroup:
+    Type: 'AWS::RDS::DBSecurityGroup'
+    Properties:
+      EC2VpcId: vpc-6398ee19
+      DBSecurityGroupIngress:
+        EC2SecurityGroupName:
+          Ref: WebServerSecurityGroup
+      GroupDescription: Frontend Access
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 755e5675-38bb-41f8-a6f0-92661a7439cb
+  DBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBName: TestDbName
+      Engine: MySQL
+      MasterUsername: mstest000
+      DBInstanceClass: db.t3.micro
+      DBSecurityGroups:
+        - Ref: DBSecurityGroup
+      AllocatedStorage: '100'
+      MasterUserPassword: haha_12345!
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 555e4878-c58c-448c-884d-5f15404e625a

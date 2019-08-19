@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    c0c42d84-ca59-4156-aeae-34890990b963:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 40
+        'y': 200
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - 555e4878-c58c-448c-884d-5f15404e625a
+        - 9fa48c84-3c30-42b0-a018-2d3a089476d9
+      dependson:
+        - 555e4878-c58c-448c-884d-5f15404e625a
+    555e4878-c58c-448c-884d-5f15404e625a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 300
+        'y': 220
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - aca9dee4-0ee3-48b3-bf09-d2f921f2880e
+    9fa48c84-3c30-42b0-a018-2d3a089476d9:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 160
+        'y': 90
+      z: 1
+      embeds: []
+    aca9dee4-0ee3-48b3-bf09-d2f921f2880e:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 300
+        'y': 90
+      z: 1
+      embeds: []
+    d392b100-dc84-41d8-8826-6668cc7e31f5:
+      source:
+        id: c0c42d84-ca59-4156-aeae-34890990b963
+      target:
+        id: 9fa48c84-3c30-42b0-a018-2d3a089476d9
+      z: 11
+Parameters:
+  myKeyName:
+    Description: Amazon EC2 Key Pair
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  mySubnetIDs:
+    Description: Subnet IDs
+    Type: 'List<AWS::EC2::Subnet::Id>'
+  DBName:
+    Default: MyDatabase
+    Description: The database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBUser:
+    NoEcho: 'true'
+    Description: The database admin account username
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: The database admin account password
+    Type: String
+    MinLength: '1'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]+'
+    ConstraintDescription: must contain only alphanumeric characters.
+  DBAllocatedStorage:
+    Default: '5'
+    Description: The size of the database (Gb)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '1024'
+  MultiAZ:
+    Description: Multi-AZ master database
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    ConstraintDescription: must be true or false.
+  DBInstanceClass:
+    Description: The database instance type
+    Type: String
+    Default: db.t2.small
+    AllowedValues:
+      - db.t1.micro
+      - db.m1.small
+      - db.m1.medium
+      - db.m1.large
+      - db.m1.xlarge
+      - db.m2.xlarge
+      - db.m2.2xlarge
+      - db.m2.4xlarge
+      - db.m3.medium
+      - db.t2.micro
+      - db.t2.small
+      - db.t2.medium
+      - db.t2.large
+    ConstraintDescription: must select a valid database instance type.
+Resources:
+  EC2Test:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SecurityGroupIds:
+        - !Ref WebServerSecurityGroup
+      InstanceType: t2.micro
+      KeyName: !Ref myKeyName
+      ImageId: ami-0b898040803850657
+      SubnetId: subnet-ed7910d3
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c0c42d84-ca59-4156-aeae-34890990b963
+    DependsOn:
+      - DBInstance
+  WebServerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable HTTP access via port 80 and SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 9fa48c84-3c30-42b0-a018-2d3a089476d9
+  DBSecurityGroup:
+    Type: 'AWS::RDS::DBSecurityGroup'
+    Properties:
+      EC2VpcId: vpc-6398ee19
+      DBSecurityGroupIngress:
+        EC2SecurityGroupName:
+          Ref: WebServerSecurityGroup
+      GroupDescription: Frontend Access
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: aca9dee4-0ee3-48b3-bf09-d2f921f2880e
+  DBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBName: TestDbName
+      Engine: MySQL
+      MasterUsername: mstest000
+      DBInstanceClass: db.t3.micro
+      DBSecurityGroups:
+        - Ref: DBSecurityGroup
+      AllocatedStorage: '100'
+      MasterUserPassword: haha_12345!
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 555e4878-c58c-448c-884d-5f15404e625a

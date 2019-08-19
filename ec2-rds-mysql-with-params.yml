@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    c0c42d84-ca59-4156-aeae-34890990b963:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 140
+        'y': -280
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - 555e4878-c58c-448c-884d-5f15404e625a
+      dependson:
+        - 555e4878-c58c-448c-884d-5f15404e625a
+    555e4878-c58c-448c-884d-5f15404e625a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 310
+        'y': -280
+      z: 0
+      embeds: []
+    e66272f3-42c3-46dd-8e46-03a132bdef82:
+      source:
+        id: c0c42d84-ca59-4156-aeae-34890990b963
+      target:
+        id: 555e4878-c58c-448c-884d-5f15404e625a
+      z: 1
+Parameters:
+  myKeyName: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+  mySubnetIDs: 
+    Description: Subnet IDs
+    Type: "List<AWS::EC2::Subnet::Id>"
+  DBName:
+    Default: MyDatabase
+    Description: The database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBUser:
+    NoEcho: 'true'
+    Description: The database admin account username
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: The database admin account password
+    Type: String
+    MinLength: '1'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]+'
+    ConstraintDescription: must contain only alphanumeric characters.
+  DBAllocatedStorage:
+    Default: '5'
+    Description: The size of the database (Gb)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '1024'
+  EC2SecurityGroup:
+    Default: default
+    Type: String
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    ConstraintDescription: must be a valid security group name. 
+  MultiAZ:
+    Description: Multi-AZ master database
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    ConstraintDescription: must be true or false.
+  DBInstanceClass:
+    Description: The database instance type
+    Type: String
+    Default: db.t2.small
+    AllowedValues:
+      - db.t1.micro
+      - db.m1.small
+      - db.m1.medium
+      - db.m1.large
+      - db.m1.xlarge
+      - db.m2.xlarge
+      - db.m2.2xlarge
+      - db.m2.4xlarge
+      - db.m3.medium
+      - db.t2.micro
+      - db.t2.small
+      - db.t2.medium
+      - db.t2.large
+    ConstraintDescription: must select a valid database instance type.
+Resources:
+  DBEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Open database for access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '3306'
+          ToPort: '3306'
+          SourceSecurityGroupName: !Ref EC2SecurityGroup
+  DBSecurityGroup:
+    Type: 'AWS::RDS::DBSecurityGroup'
+    Properties:
+      DBSecurityGroupIngress:
+        EC2SecurityGroupName: !Ref EC2SecurityGroup
+      GroupDescription: database access
+  EC2Test:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref myKeyName
+      ImageId: ami-0b898040803850657
+      SubnetId: !Ref mySubnetIDs
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c0c42d84-ca59-4156-aeae-34890990b963
+  WebServerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Open database for access on EC2 web server
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '3306'
+          ToPort: '3306'
+          SourceSecurityGroupName: !Ref EC2SecurityGroup
+  DBSecurityGroup:
+    Type: 'AWS::RDS::DBSecurityGroup'
+    Properties:
+      DBSecurityGroupIngress:
+        EC2SecurityGroupName: !Ref EC2SecurityGroup
+      GroupDescription: database access
+  DBSecurityGroup:
+    Type: 'AWS::RDS::DBSecurityGroup'
+    Properties:
+      EC2VpcId: vpc-6398ee19
+      DBSecurityGroupIngress:
+        EC2SecurityGroupName:
+          Ref: 'WebServerSecurityGroup'
+      GroupDescription: 'Frontend Access'
+  MasterDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBName: !Ref DBName
+      AllocatedStorage: !Ref DBAllocatedStorage
+      DBInstanceClass: !Ref DBInstanceClass
+      Engine: MySQL
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      MultiAZ: !Ref MultiAZ
+      Tags:
+        - Key: Name
+          Value: Master Database
+      VPCSecurityGroups: !If 
+        - Is-EC2-VPC
+        - - !GetAtt 
+            - DBEC2SecurityGroup
+            - GroupId
+        - !Ref 'AWS::NoValue'
+      DBSecurityGroups: !If 
+        - Is-EC2-Classic
+        - - !Ref DBSecurityGroup
+        - !Ref 'AWS::NoValue'
+    DeletionPolicy: Snapshot
+  ReplicaDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      SourceDBInstanceIdentifier: !Ref MasterDB
+      DBInstanceClass: !Ref DBInstanceClass
+      Tags:
+        - Key: Name
+          Value: Read Replica Database
+Outputs:
+  MasterJDBCConnectionString:
+    Description: JDBC connection string for the master database
+    Value: !Join 
+      - ''
+      - - 'jdbc:mysql://'
+        - !GetAtt 
+          - MasterDB
+          - Endpoint.Address
+        - ':'
+        - !GetAtt 
+          - MasterDB
+          - Endpoint.Port
+        - /
+        - !Ref DBName
+  ReplicaJDBCConnectionString:
+    Description: JDBC connection string for the replica database
+    Value: !Join 
+      - ''
+      - - 'jdbc:mysql://'
+        - !GetAtt 
+          - ReplicaDB
+          - Endpoint.Address
+        - ':'
+        - !GetAtt 
+          - ReplicaDB
+          - Endpoint.Port
+        - /
+        - !Ref DBName

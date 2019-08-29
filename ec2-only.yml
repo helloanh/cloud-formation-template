@@ -18,14 +18,20 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-
+Parameters:
+  myKeyName: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+  mySubnetIDs: 
+    Description: Subnet IDs
+    Type: "List<AWS::EC2::Subnet::Id>"
 Resources:  
   WebInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.nano
       ImageId: ami-0b898040803850657
-      KeyName: Anh_EC2_Mac15
+      KeyName: !Ref myKeyName
       SecurityGroupIds:
         - sg-02f834d3be762bb87
       SubnetId: subnet-05116e412e797dbde

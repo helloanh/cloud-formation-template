@@ -11,10 +11,7 @@ Metadata:
       z: 1
       embeds: []
       isassociatedwith:
-        - 555e4878-c58c-448c-884d-5f15404e625a
         - 9fa48c84-3c30-42b0-a018-2d3a089476d9
-      dependson:
-        - 555e4878-c58c-448c-884d-5f15404e625a
     555e4878-c58c-448c-884d-5f15404e625a:
       size:
         width: 60
@@ -44,13 +41,10 @@ Metadata:
         'y': 90
       z: 1
       embeds: []
-    d392b100-dc84-41d8-8826-6668cc7e31f5:
-      source:
-        id: c0c42d84-ca59-4156-aeae-34890990b963
-      target:
-        id: 9fa48c84-3c30-42b0-a018-2d3a089476d9
-      z: 11
 Parameters:
+  myVpcId:
+    Description: Your VPC Id
+    Type: 'AWS::EC2::VPC::Id'
   myKeyName:
     Description: Amazon EC2 Key Pair
     Type: 'AWS::EC2::KeyPair::KeyName'
@@ -123,12 +117,10 @@ Resources:
       InstanceType: t2.micro
       KeyName: !Ref myKeyName
       ImageId: ami-0b898040803850657
-      SubnetId: subnet-ed7910d3
+      SubnetId: !Ref mySubnetIDs
     Metadata:
       'AWS::CloudFormation::Designer':
         id: c0c42d84-ca59-4156-aeae-34890990b963
-    DependsOn:
-      - DBInstance
   WebServerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -148,7 +140,7 @@ Resources:
   DBSecurityGroup:
     Type: 'AWS::RDS::DBSecurityGroup'
     Properties:
-      EC2VpcId: vpc-6398ee19
+      EC2VpcId: !Ref myVpcId
       DBSecurityGroupIngress:
         EC2SecurityGroupName:
           Ref: WebServerSecurityGroup
